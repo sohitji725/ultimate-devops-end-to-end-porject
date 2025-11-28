@@ -1,14 +1,23 @@
-# Build your custom binary (same as official but with YOUR code)
-FROM golang:1.24-bookworm AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o product-catalog .
+FROM golang:1.22-alpine AS builder
+WORKDIR /usr/src/app/
 
-# Use official distroless base (secure + tiny)
-FROM gcr.io/distroless/static-debian12:nonroot
-WORKDIR /app
-COPY --from=builder /app/product-catalog .
-COPY products/ products/
+# Cache Go modules
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
+
+COPY go.mod go.sum ./
+COPY . .
+
+RUN go build -o product-catalog .
+
+# Final stage - Alpine (has curl, works with OTEL)
+FROM alpine:latest
+WORKDIR /usr/src/app/
+
+# Copy products folder and binary
+COPY products/ ./products/
+COPY --from=builder /usr/src/app/product-catalog ./
+
+ENV PRODUCT_CATALOG_PORT=8088
 ENTRYPOINT ["./product-catalog"]

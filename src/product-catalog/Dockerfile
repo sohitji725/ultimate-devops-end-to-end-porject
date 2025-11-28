@@ -10,4 +10,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o product-catalog .
 FROM gcr.io/distroless/static-debian12:nonroot
 WORKDIR /app
 COPY --from=builder /app/product-catalog .
+COPY products/ products/
 ENTRYPOINT ["./product-catalog"]

@@ -31,7 +31,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: productcatalogservice
-          image: gcr.io/distroless/static-debian12:nonroot
+          image: sohit725/product-catalog:19803702763
           imagePullPolicy: IfNotPresent
           ports:
             

@@ -9,8 +9,8 @@ terraform {
   backend "s3" {
     bucket         = "demo-terraform-eks-state-s3-bucket"
     key            = "terraform.tfstate"
-    region         = "us-west-2"
-    dynamodb_table = "terraform-eks-state-locks"
+    region         = "ap-south-1"
+    use_lockfile = true
     encrypt        = true
   }
 }
@@ -38,3 +38,4 @@ module "eks" {
   subnet_ids      = module.vpc.private_subnet_ids
   node_groups     = var.node_groups
 }
+
